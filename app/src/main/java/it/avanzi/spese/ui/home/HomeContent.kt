@@ -51,6 +51,7 @@ import it.avanzi.spese.ui.components.CategoryTile
 import it.avanzi.spese.ui.components.ProgressBar
 import it.avanzi.spese.ui.components.SectionHeader
 import it.avanzi.spese.ui.icons.SpeseIcons
+import it.avanzi.spese.ui.recurring.scheduled
 import it.avanzi.spese.ui.theme.LocalReducedMotion
 import it.avanzi.spese.ui.theme.SpeseColors
 import it.avanzi.spese.ui.theme.SpeseMotion
@@ -139,7 +140,24 @@ fun HomeContent(
     }
     Card {
         Text(stringResource(R.string.upcoming), style = SpeseText.CardTitle)
-        Text(stringResource(R.string.none_upcoming), color = SpeseColors.TextMuted, style = SpeseText.Meta)
+        val schedule = if (currentMonth) state.recurrings.scheduled(today.plusDays(1), state.month.atEndOfMonth())
+            else emptyList()
+        if (schedule.isEmpty()) Text(stringResource(R.string.none_upcoming), color = SpeseColors.TextMuted, style = SpeseText.Meta)
+        schedule.take(3).forEach { entry ->
+            val category = state.categories.firstOrNull { it.id == entry.recurring.categoryId }
+            Row(
+                Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (category != null) CategoryTile(entry.recurring.iconKey, Color(category.colorArgb), size = 30.dp, iconSize = 16.dp)
+                Text(entry.recurring.name, Modifier.weight(1f), style = SpeseText.BodyMedium)
+                Text(
+                    if (entry.date == today.plusDays(1)) stringResource(R.string.tomorrow).lowercase(Locale.ITALY) else ItalianFormats.shortDate(entry.date),
+                    style = SpeseText.Meta, color = SpeseColors.TextMuted,
+                )
+                Text(ItalianFormats.money(entry.cents), style = SpeseText.RowAmount)
+            }
+        }
         Action(stringResource(R.string.all_recurring), onRecurring, icon = "chevronRight")
     }
     WeekCard(state, today)

@@ -26,3 +26,8 @@
 
 - Il Budget mostra il mese corrente. Il limite suggerito usa un minimo di 50 euro e scatti di 50 euro.
 - Le notifiche delle soglie condividono il canale e la pianificazione introdotti con i ricorrenti.
+
+## Fase 6
+
+- La generazione aggiorna il cursore del ricorrente nella stessa transazione delle spese. Al cambio di frequenza il cursore impedisce di riscrivere le occorrenze storiche.
+- Il lavoro giornaliero si ripianifica alle 00:05 locali. WorkManager può ritardarlo secondo le condizioni del dispositivo.

@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import it.avanzi.spese.domain.UpdateChannel
@@ -50,11 +51,26 @@ class PreferencesRepository @Inject constructor(@ApplicationContext context: Con
     suspend fun setLastCheck(value: Instant) = put(lastCheck, value.toEpochMilli())
     suspend fun dismissBanner(version: String) = put(bannerDismissed, version)
 
+    suspend fun recordBudgetAlert(month: String, alert: String): Boolean {
+        var added = false
+        store.edit { data ->
+            val previous = if (data[alertMonth] == month) data[budgetAlerts].orEmpty() else emptySet()
+            added = alert !in previous
+            if (added) {
+                data[alertMonth] = month
+                data[budgetAlerts] = previous + alert
+            }
+        }
+        return added
+    }
+
     private suspend fun <T> put(key: Preferences.Key<T>, value: T) {
         store.edit { it[key] = value }
     }
 
     private companion object {
+        val alertMonth = stringPreferencesKey("alertMonth")
+        val budgetAlerts = stringSetPreferencesKey("budgetAlerts")
         val budgetEnabled = booleanPreferencesKey("overallBudgetEnabled")
         val budgetCents = longPreferencesKey("overallBudgetCents")
         val autoCheck = booleanPreferencesKey("update.autoCheck")

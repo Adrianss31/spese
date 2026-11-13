@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+data class OccurrenceLink(val expenseId: Long, val recurringId: Long, val epochDay: Long)
+
 data class LedgerState(
     val categories: List<CategoryEntity> = emptyList(),
     val expenses: List<ExpenseEntity> = emptyList(),
@@ -35,6 +37,13 @@ class SpeseViewModel @Inject constructor(
     val repository: SpeseRepository,
     val preferences: PreferencesRepository,
 ) : ViewModel() {
+    private val pendingLink = MutableStateFlow<OccurrenceLink?>(null)
+    val occurrenceLink: kotlinx.coroutines.flow.StateFlow<OccurrenceLink?> = pendingLink
+    fun openOccurrence(expense: Long, recurring: Long, date: Long) {
+        pendingLink.value = OccurrenceLink(expense, recurring, date)
+    }
+    fun consumeOccurrence(link: OccurrenceLink) { pendingLink.compareAndSet(link, null) }
+
     private val month = MutableStateFlow(YearMonth.now())
     val state = combine(
         repository.categories, repository.expenses, repository.recurrings, preferences.values, month,

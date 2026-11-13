@@ -5,6 +5,7 @@ import androidx.room.Room
 import it.avanzi.spese.domain.ExpenseStatus
 import java.time.Instant
 import java.time.LocalDate
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -57,5 +58,32 @@ class SpeseDaoTest {
         repository.saveExpense(confirmed)
         repository.saveExpense(confirmed.copy(amountCents = 999, status = ExpenseStatus.PENDING))
         assertEquals(listOf(700L), database.dao().confirmedBetween(date, date).map { it.amountCents })
+    }
+    @Test fun catchUpIsIdempotentAcrossConcurrentRuns() = runBlocking {
+        repository.initializeCategories()
+        val category = repository.categories.first().first()
+        val anchor = LocalDate.parse("2024-01-31")
+        val today = LocalDate.parse("2024-03-31")
+        val rule = RecurringEntity(
+            name = "Luce", amountCents = 1500, categoryId = category.id, iconKey = "bolt",
+            frequency = it.avanzi.spese.domain.Frequency.MONTHLY, dayOfMonth = 31,
+            anchorDate = anchor, isVariable = true,
+        )
+        repository.saveRecurring(rule)
+        repository.saveRecurring(rule.copy(name = "Promemoria", autoRecord = false))
+        val engine = RecurringEngine(database)
+        val notifications = kotlinx.coroutines.coroutineScope {
+            val first = async { engine.generate(today, Instant.EPOCH) }
+            val second = async { engine.generate(today, Instant.EPOCH) }
+            first.await() + second.await()
+        }
+        assertEquals(6, notifications.size)
+        assertEquals(3, notifications.count { it.pendingExpenseId != null })
+        val expenses = repository.expenses.first()
+        assertEquals(listOf("2024-03-31", "2024-02-29", "2024-01-31"), expenses.map { it.date.toString() })
+        assertEquals(0, database.dao().confirmedBetween(anchor, today).size)
+        repository.confirmExpense(expenses.first().id, 1800)
+        assertEquals(1800L, database.dao().totalOn(today))
+        assertEquals(emptyList<GeneratedOccurrence>(), engine.generate(today, Instant.EPOCH))
     }
 }

@@ -11,7 +11,10 @@ hilt = "2.60.1"
 ksp = "2.3.12"
 robolectric = "4.16.1"
 
+work = "2.11.2"
+
 [libraries]
+work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }

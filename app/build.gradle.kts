@@ -33,6 +33,7 @@ android {
 
 dependencies {
     implementation(libs.room.runtime)
+    implementation(libs.work.runtime)
     ksp(libs.room.compiler)
     implementation(libs.datastore)
     implementation(libs.hilt.android)

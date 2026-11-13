@@ -91,6 +91,8 @@ fun SpeseScreen(model: SpeseViewModel) {
     var destination by rememberSaveable { mutableStateOf(Destination.HOME) }
     var editor by rememberSaveable { mutableStateOf(false) }
     var editorKey by rememberSaveable { mutableLongStateOf(0) }
+    var reminderId by rememberSaveable { mutableLongStateOf(0) }
+    var reminderDay by rememberSaveable { mutableLongStateOf(0) }
     var selectedExpense by rememberSaveable { mutableLongStateOf(0) }
     var showMonths by rememberSaveable { mutableStateOf(false) }
     var searchImmediately by rememberSaveable { mutableStateOf(false) }
@@ -101,7 +103,22 @@ fun SpeseScreen(model: SpeseViewModel) {
     val context = LocalContext.current
     val reduced = LocalReducedMotion.current
     val expense = ledger.expenses.firstOrNull { it.id == selectedExpense }
+    val reminder = ledger.recurrings.firstOrNull { it.id == reminderId }
+    val occurrenceLink by model.occurrenceLink.collectAsState()
+    LaunchedEffect(occurrenceLink, ledger.expenses, ledger.recurrings) {
+        val link = occurrenceLink ?: return@LaunchedEffect
+        if (link.expenseId > 0 && ledger.expenses.none { it.id == link.expenseId }) return@LaunchedEffect
+        if (link.recurringId > 0 && ledger.recurrings.none { it.id == link.recurringId }) return@LaunchedEffect
+        selectedExpense = link.expenseId
+        reminderId = link.recurringId
+        reminderDay = link.epochDay
+        destination = Destination.HOME
+        editorKey++
+        editor = true
+        model.consumeOccurrence(link)
+    }
     val openExpense = {
+        reminderId = 0
         editorKey++
         selectedExpense = 0
         editor = true
@@ -140,16 +157,18 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 onAll = { searchImmediately = false; destination = Destination.SEARCH },
                                 onRecurring = { destination = Destination.RECURRING },
                                 highlightedId = undo?.expenseId,
-                                onExpense = { row -> editorKey++; selectedExpense = row.id; editor = true },
+                                onExpense = { row -> editorKey++; selectedExpense = row.id; reminderId = 0; editor = true },
                             )
                             Destination.SEARCH -> ExpenseSearch(ledger, searchImmediately, back) { row ->
                                 editorKey++
                                 selectedExpense = row.id
+                                reminderId = 0
                                 editor = true
                             }
                             Destination.MORE -> MoreContent(ledger) { destination = it }
                             Destination.STATS -> it.avanzi.spese.ui.stats.Statistics(ledger)
                             Destination.CATEGORIES -> it.avanzi.spese.ui.manage.Categories(ledger, model, back)
+                            Destination.RECURRING -> it.avanzi.spese.ui.recurring.RecurringScreen(ledger, model)
                             Destination.BUDGET -> it.avanzi.spese.ui.manage.Budget(ledger, model, back)
                             else -> PageHeader(stringResource(screen.label), if (screen !in tabs) back else null)
                         }
@@ -205,6 +224,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 } else {
                                     val saved = model.save(
                                         draft.cents, draft.category, draft.description, draft.date, draft.frequency,
+                                        reminderId.takeIf { it > 0 },
                                     )
                                     model.selectMonth(YearMonth.from(draft.date))
                                     destination = Destination.HOME
@@ -215,6 +235,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                     )
                                 }
                                 editor = false
+                                it.avanzi.spese.data.LedgerWorker.onOpen(context)
                             } catch (cancelled: CancellationException) {
                                 throw cancelled
                             } catch (_: Exception) {
@@ -227,10 +248,10 @@ fun SpeseScreen(model: SpeseViewModel) {
                         }
                     }
                 },
-                initialCents = expense?.amountCents,
-                initialCategory = expense?.categoryId,
-                initialDescription = expense?.description.orEmpty(),
-                initialDate = expense?.date ?: LocalDate.now(),
+                initialCents = expense?.amountCents ?: reminder?.amountCents,
+                initialCategory = expense?.categoryId ?: reminder?.categoryId,
+                initialDescription = (expense?.description ?: reminder?.name).orEmpty(),
+                initialDate = expense?.date ?: reminder?.let { LocalDate.ofEpochDay(reminderDay) } ?: LocalDate.now(),
                 confirmation = selectedExpense != 0L,
             )
         }
