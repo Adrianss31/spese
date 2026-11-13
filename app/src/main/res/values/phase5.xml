@@ -1,0 +1,23 @@
+<resources>
+    <string name="new_category">Nuova categoria</string><string name="edit_category">Modifica categoria</string>
+    <string name="new_feminine">Nuova</string><string name="name">Nome</string>
+    <string name="color">Colore</string><string name="icon">Icona</string><string name="amount">Importo</string>
+    <string name="delete">Elimina</string><string name="monthly_limit">Limite mensile</string>
+    <string name="category_guide">Tocca per modificare nome, colore, icona e limite. Tieni premuto per riordinare.</string>
+    <string name="category_spent">%1$s a %2$s</string><string name="category_limit">%1$s · limite %2$s</string>
+    <string name="delete_category_note">Se la elimini, le sue spese e i ricorrenti passano ad «Altro».</string>
+    <string name="limit_hint">Facoltativo · avvisa all’85%% e oltre il limite</string>
+    <string name="reorder">Riordina %1$s</string><string name="move_up">Sposta sopra</string><string name="move_down">Sposta sotto</string>
+    <string name="budget_overall">Budget mensile complessivo</string>
+    <string name="budget_disabled">Nessun tetto complessivo: vedi solo quanto spendi, senza avvisi.</string>
+    <string name="budget_remaining">Restano su %1$s · %2$d giorni rimasti · circa %3$s al giorno</string>
+    <string name="budget_amount_title">Importo del budget</string>
+    <string name="with_limit">Con limite</string><string name="without_limit">Senza limite</string>
+    <string name="almost_limit">Quasi al limite</string><string name="over_limit">Superato</string>
+    <string name="exceeded_by">Superato di %1$s</string><string name="remove_limit">Rimuovi limite</string>
+    <string name="category_usage">%1$s di %2$s</string><string name="add_limit">Limite</string>
+    <string name="budget_note">I limiti sono facoltativi: imposta solo quelli che ti servono.</string>
+    <string name="budget_alert">%1$s · %2$d%% del limite mensile</string>
+    <string-array name="palette_names"><item>Menta</item><item>Cielo</item><item>Lilla</item><item>Ambra</item><item>Rosa</item><item>Albicocca</item><item>Prato</item><item>Acqua</item><item>Orchidea</item><item>Grigio</item></string-array>
+    <string-array name="category_icon_names"><item>Carrello</item><item>Casa</item><item>Treno</item><item>Posate</item><item>Biglietto</item><item>Altro</item><item>Auto</item><item>Salute</item><item>Regalo</item><item>Libro</item><item>Abiti</item><item>Viaggi</item><item>Energia</item><item>Internet</item><item>Telefono</item><item>Sport</item><item>Musica</item><item>Animali</item></string-array>
+</resources>

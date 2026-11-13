@@ -21,3 +21,8 @@
 ## Fase 4
 
 - Gli ultimi sei mesi terminano al mese selezionato e includono a zero i mesi senza spese.
+
+## Fase 5
+
+- Il Budget mostra il mese corrente. Il limite suggerito usa un minimo di 50 euro e scatti di 50 euro.
+- Le notifiche delle soglie condividono il canale e la pianificazione introdotti con i ricorrenti.
