@@ -43,7 +43,7 @@
 
 ## Fase 9
 
-- Il repository GitHub è privato. Per gli aggiornamenti in app è previsto un token GitHub in sola lettura, protetto dall'Android Keystore.
+- Il repository GitHub è pubblico, così l'app controlla e scarica le release senza credenziali. Il campo per un token GitHub in sola lettura (protetto dall'Android Keystore) resta solo come riserva e compare se GitHub nega l'accesso.
 - Il download verifica dimensione, SHA-256, package, versione e certificato prima di consegnare l'APK all'installatore di Android.
 
 ## CI
