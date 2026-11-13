@@ -1,0 +1,29 @@
+<resources>
+    <string name="available_version">Versione %1$s</string>
+    <string name="installed_version">Installata: %1$s · %2$s MB</string>
+    <string name="version_available">Versione %1$s disponibile</string>
+    <string name="update_now">Aggiorna</string>
+    <string name="download_install">Scarica e installa</string>
+    <string name="downloading">Download in corso…</string>
+    <string name="download_progress">%1$d%% · %2$s di %3$s MB</string>
+    <string name="install_now">Installa ora</string>
+    <string name="install_note">Android ti chiederà di confermare l’installazione. I tuoi dati restano dove sono.</string>
+    <string name="up_to_date">Sei aggiornato · Versione %1$s</string>
+    <string name="auto_update">Controlla automaticamente</string>
+    <string name="auto_update_hint">All’avvio e una volta al giorno</string>
+    <string name="wifi_only">Scarica solo con Wi‑Fi</string>
+    <string name="update_channel">Canale</string><string name="stable">Stabile</string><string name="beta">Beta</string>
+    <string name="last_check">Ultimo controllo: %1$s alle %2$s</string>
+    <string name="never_checked">Nessun controllo eseguito</string>
+    <string name="check_now">Controlla ora</string><string name="checking">Controllo in corso…</string>
+    <string name="signed_releases_note">Gli aggiornamenti arrivano dalle release firmate su GitHub; Android chiede conferma prima di installarli.</string>
+    <string name="update_private">Per controllare le release del repository privato, configura l’accesso a GitHub.</string>
+    <string name="update_network_error">Controllo non riuscito. Riprova.</string>
+    <string name="update_needs_wifi">Collegati a una rete Wi‑Fi per proseguire.</string>
+    <string name="update_download_error">Download incompleto o verifica dell’APK non riuscita.</string>
+    <string name="update_install_error">Installazione non riuscita.</string>
+    <string name="update_access">Accesso GitHub</string>
+    <string name="update_token_hint">Usa un token GitHub con accesso in sola lettura ai contenuti di Adrianss31/spese.</string>
+    <string name="update_token">Token di accesso GitHub</string>
+    <string name="remove_token">Rimuovi token</string>
+</resources>

@@ -36,6 +36,7 @@ data class LedgerState(
 class SpeseViewModel @Inject constructor(
     val repository: SpeseRepository,
     val preferences: PreferencesRepository,
+    val updates: it.avanzi.spese.data.update.UpdateManager,
 ) : ViewModel() {
     private val pendingLink = MutableStateFlow<OccurrenceLink?>(null)
     val occurrenceLink: kotlinx.coroutines.flow.StateFlow<OccurrenceLink?> = pendingLink
@@ -53,6 +54,8 @@ class SpeseViewModel @Inject constructor(
     init {
         viewModelScope.launch { repository.initializeCategories() }
     }
+
+    fun scheduleUpdates() { viewModelScope.launch { updates.schedule() } }
 
     fun selectMonth(value: YearMonth) { month.value = value }
 

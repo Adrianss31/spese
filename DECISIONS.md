@@ -40,3 +40,8 @@
 ## Fase 8
 
 - Gli intervalli includono entrambi gli estremi e l'export esclude gli importi da confermare. Nel CSV le celle di testo che possono essere interpretate come formule vengono protette con un apostrofo.
+
+## Fase 9
+
+- Il repository GitHub è privato. Per gli aggiornamenti in app è previsto un token GitHub in sola lettura, protetto dall'Android Keystore.
+- Il download verifica dimensione, SHA-256, package, versione e certificato prima di consegnare l'APK all'installatore di Android.

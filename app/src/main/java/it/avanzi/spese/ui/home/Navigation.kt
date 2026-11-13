@@ -52,6 +52,9 @@ import androidx.compose.ui.unit.dp
 import it.avanzi.spese.R
 import it.avanzi.spese.data.SavedExpense
 import it.avanzi.spese.domain.ItalianFormats
+import it.avanzi.spese.data.update.AvailableUpdate
+import it.avanzi.spese.ui.update.UpdateBanner
+import it.avanzi.spese.ui.update.UpdatesScreen
 import it.avanzi.spese.ui.components.AppBottomSheet
 import it.avanzi.spese.ui.components.SectionHeader
 import it.avanzi.spese.ui.components.ToastMessage
@@ -88,6 +91,7 @@ private val tabs = Destination.entries.take(4)
 @Composable
 fun SpeseScreen(model: SpeseViewModel) {
     val ledger by model.state.collectAsState()
+    val updates by model.updates.state.collectAsState()
     var destination by rememberSaveable { mutableStateOf(Destination.HOME) }
     var editor by rememberSaveable { mutableStateOf(false) }
     var editorKey by rememberSaveable { mutableLongStateOf(0) }
@@ -157,6 +161,14 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 onAll = { searchImmediately = false; destination = Destination.SEARCH },
                                 onRecurring = { destination = Destination.RECURRING },
                                 highlightedId = undo?.expenseId,
+                                updateBanner = {
+                                    val update = updates.available
+                                    if (update != null && ledger.preferences.bannerDismissedVersion != update.version.versionName) {
+                                        UpdateBanner(update, { destination = Destination.UPDATES }) {
+                                            scope.launch { model.preferences.dismissBanner(update.version.versionName) }
+                                        }
+                                    }
+                                },
                                 onExpense = { row -> editorKey++; selectedExpense = row.id; reminderId = 0; editor = true },
                             )
                             Destination.SEARCH -> ExpenseSearch(ledger, searchImmediately, back) { row ->
@@ -165,7 +177,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 reminderId = 0
                                 editor = true
                             }
-                            Destination.MORE -> MoreContent(ledger) { destination = it }
+                            Destination.MORE -> MoreContent(ledger, updates.available) { destination = it }
                             Destination.STATS -> it.avanzi.spese.ui.stats.Statistics(ledger)
                             Destination.CATEGORIES -> it.avanzi.spese.ui.manage.Categories(ledger, model, back)
                             Destination.RECURRING -> it.avanzi.spese.ui.recurring.RecurringScreen(ledger, model)
@@ -174,13 +186,14 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 toast = message
                             }
                             Destination.BUDGET -> it.avanzi.spese.ui.manage.Budget(ledger, model, back)
-                            else -> PageHeader(stringResource(screen.label), if (screen !in tabs) back else null)
+                            Destination.UPDATES -> UpdatesScreen(updates, ledger.preferences, model.preferences, model.updates, back)
                         }
                     }
                 }
                 NavigationBar(
                     selected = if (destination in tabs) destination else if (destination == Destination.SEARCH) Destination.HOME else Destination.MORE,
                     onSelect = { destination = it },
+                    showUpdate = updates.available != null,
                 )
             }
 
@@ -280,7 +293,7 @@ fun PageHeader(title: String, onBack: (() -> Unit)? = null, action: @Composable 
 }
 
 @Composable
-private fun NavigationBar(selected: Destination, onSelect: (Destination) -> Unit) {
+private fun NavigationBar(selected: Destination, onSelect: (Destination) -> Unit, showUpdate: Boolean) {
     Column(Modifier.background(Color(0xF5121419))) {
         HorizontalDivider(color = SpeseColors.Divider)
         Row(
@@ -301,7 +314,13 @@ private fun NavigationBar(selected: Destination, onSelect: (Destination) -> Unit
                         Modifier.size(56.dp, 32.dp)
                             .background(if (active) Color(0xFF23262E) else Color.Transparent, SpeseShapes.Pill),
                         contentAlignment = Alignment.Center,
-                    ) { Icon(SpeseIcons[tab.icon], null, Modifier.size(22.dp), tint = color) }
+                    ) {
+                        Icon(SpeseIcons[tab.icon], null, Modifier.size(22.dp), tint = color)
+                        if (tab == Destination.MORE && showUpdate) Box(
+                            Modifier.align(Alignment.TopEnd).padding(top = 4.dp, end = 12.dp)
+                                .size(8.dp).background(SpeseColors.Accent, SpeseShapes.Pill),
+                        )
+                    }
                     Text(stringResource(tab.label), color = color, style = SpeseText.MetaMedium)
                 }
             }
@@ -335,7 +354,7 @@ private fun AddButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun MoreContent(state: LedgerState, navigate: (Destination) -> Unit) {
+private fun MoreContent(state: LedgerState, update: AvailableUpdate?, navigate: (Destination) -> Unit) {
     PageHeader(stringResource(R.string.more))
     val active = state.recurrings.filter { it.active }
     val limits = state.categories.count { it.monthlyLimitCents != null }
@@ -352,7 +371,7 @@ private fun MoreContent(state: LedgerState, navigate: (Destination) -> Unit) {
             ),
         ),
         R.string.section_data to listOf(Destination.EXPORT to null),
-        R.string.section_app to listOf(Destination.UPDATES to null),
+        R.string.section_app to listOf(Destination.UPDATES to update?.let { stringResource(R.string.version_available, it.version.versionName) }),
     )
     groups.forEach { (group, options) ->
         SectionHeader(stringResource(group))

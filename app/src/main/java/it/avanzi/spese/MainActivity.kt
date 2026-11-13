@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         LedgerWorker.onOpen(this)
+        model.scheduleUpdates()
     }
 
     override fun onNewIntent(intent: Intent) {

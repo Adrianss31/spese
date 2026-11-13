@@ -78,6 +78,7 @@ fun HomeContent(
     onAll: () -> Unit,
     onRecurring: () -> Unit,
     highlightedId: Long?,
+    updateBanner: @Composable () -> Unit = {},
     onExpense: (ExpenseEntity) -> Unit,
 ) {
     val today = LocalDate.now()
@@ -106,6 +107,7 @@ fun HomeContent(
         }
         IconAction("search", stringResource(R.string.search), onSearch)
     }
+    updateBanner()
     Card {
         Text(
             stringResource(if (currentMonth) R.string.spent_month else R.string.spent_period),

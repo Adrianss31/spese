@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.hilt)
@@ -18,7 +19,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
     }
 
     compileOptions {
@@ -36,6 +37,7 @@ dependencies {
     implementation(libs.work.runtime)
     implementation(libs.glance.appwidget)
     implementation(libs.serialization.json)
+    implementation(libs.okhttp)
     ksp(libs.room.compiler)
     implementation(libs.datastore)
     implementation(libs.hilt.android)
