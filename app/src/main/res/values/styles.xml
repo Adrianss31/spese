@@ -1,9 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.Spese" parent="android:style/Theme.Material.NoActionBar">
         <item name="android:windowBackground">#0E0F12</item>
         <item name="android:colorAccent">#C6F432</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
     </style>
     <style name="Theme.Spese.Popup" parent="Theme.Spese">
         <item name="android:windowIsTranslucent">true</item>

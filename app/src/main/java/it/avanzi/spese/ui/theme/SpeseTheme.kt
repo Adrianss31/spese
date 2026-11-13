@@ -2,11 +2,13 @@ package it.avanzi.spese.ui.theme
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -93,6 +95,9 @@ fun SpeseTheme(content: @Composable () -> Unit) {
             large = SpeseShapes.Group,
             extraLarge = SpeseShapes.Card,
         ),
-        content = { ProvideSpeseMotion(content) },
+        content = {
+            // Default text and icon colour for every surface, including sheets shown in their own dialog window.
+            CompositionLocalProvider(LocalContentColor provides SpeseColors.Text) { ProvideSpeseMotion(content) }
+        },
     )
 }

@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -105,6 +106,7 @@ fun SpeseScreen(model: SpeseViewModel) {
     var saving by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val reduced = LocalReducedMotion.current
     val expense = ledger.expenses.firstOrNull { it.id == selectedExpense }
     val reminder = ledger.recurrings.firstOrNull { it.id == reminderId }
@@ -251,7 +253,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                     undo = saved
                                     toast = ToastMessage(
                                         saved.expenseId,
-                                        context.getString(R.string.expense_saved, ItalianFormats.money(draft.cents)),
+                                        resources.getString(R.string.expense_saved, ItalianFormats.money(draft.cents)),
                                     )
                                 }
                                 editor = false
@@ -261,7 +263,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 throw cancelled
                             } catch (_: Exception) {
                                 undo = null
-                                toast = ToastMessage(-1, context.getString(R.string.operation_failed), false)
+                                toast = ToastMessage(-1, resources.getString(R.string.operation_failed), false)
                                 editor = false
                             } finally {
                                 saving = false

@@ -12,7 +12,9 @@ import it.avanzi.spese.data.EXTRA_OCCURRENCE
 import it.avanzi.spese.data.LedgerWorker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import android.graphics.Color as AndroidColor
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import it.avanzi.spese.ui.home.SpeseScreen
@@ -53,7 +55,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Dark-only app: always light system bar icons, whatever the system theme.
+        enableEdgeToEdge(SystemBarStyle.dark(AndroidColor.TRANSPARENT), SystemBarStyle.dark(AndroidColor.TRANSPARENT))
         openNotification(intent)
         val permission = getPreferences(MODE_PRIVATE)
         if (Build.VERSION.SDK_INT >= 33 &&

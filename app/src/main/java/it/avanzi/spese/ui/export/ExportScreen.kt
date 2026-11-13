@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -65,6 +66,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ExportScreen(state: LedgerState, back: () -> Unit, onToast: (ToastMessage) -> Unit) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val today = LocalDate.now()
     var period by rememberSaveable { mutableStateOf(ExportPeriod.CURRENT) }
@@ -169,12 +171,12 @@ fun ExportScreen(state: LedgerState, back: () -> Unit, onToast: (ToastMessage) -
                             clipData = ClipData.newUri(context.contentResolver, fileName, uri)
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         }
-                        context.startActivity(Intent.createChooser(share, context.getString(R.string.export_share)))
-                        onToast(ToastMessage(System.nanoTime(), context.getString(R.string.export_ready, fileName), false))
+                        context.startActivity(Intent.createChooser(share, resources.getString(R.string.export_share)))
+                        onToast(ToastMessage(System.nanoTime(), resources.getString(R.string.export_ready, fileName), false))
                     } catch (cancelled: CancellationException) {
                         throw cancelled
                     } catch (_: Exception) {
-                        onToast(ToastMessage(System.nanoTime(), context.getString(R.string.operation_failed), false))
+                        onToast(ToastMessage(System.nanoTime(), resources.getString(R.string.operation_failed), false))
                     } finally {
                         busy = false
                     }
