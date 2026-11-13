@@ -1,0 +1,35 @@
+<resources>
+    <string name="home">Home</string><string name="stats">Statistiche</string>
+    <string name="recurrings">Ricorrenti</string><string name="more">Altro</string>
+    <string name="budget">Budget</string><string name="categories">Categorie</string>
+    <string name="recurring_payments">Pagamenti ricorrenti</string>
+    <string name="export">Esporta dati</string><string name="updates">Aggiornamenti</string>
+    <string name="description">Descrizione</string>
+    <string name="description_optional">Descrizione (facoltativa)</string>
+    <string name="description_hint">Es. pranzo con colleghi</string>
+    <string name="date">Data</string><string name="today">Oggi</string><string name="yesterday">Ieri</string>
+    <string name="repeat_week">Verrà registrata da sola ogni %1$s.</string>
+    <string name="repeat_month">Verrà registrata da sola il %1$d di ogni mese.</string>
+    <string name="repeat_year">Verrà registrata da sola ogni %1$d %2$s.</string>
+    <string name="save">Salva</string><string name="confirm">Conferma</string><string name="bimonth">2 mesi</string>
+    <string name="back">Indietro</string><string name="change_month">Cambia mese, ora %1$s</string>
+    <string name="search">Cerca tra le spese</string><string name="spent_month">Speso questo mese</string>
+    <string name="spent_period">Speso nel mese</string>
+    <string name="used_budget">%1$d%% di %2$s</string><string name="remaining">Restano %1$s</string>
+    <string name="over_budget">Oltre di %1$s</string>
+    <string name="recurring_charged">Ricorrenti già addebitati · %1$s</string>
+    <string name="upcoming">In arrivo</string><string name="none_upcoming">Nessun addebito fino a fine mese.</string>
+    <string name="all_recurring">Tutti i ricorrenti</string><string name="this_week">Questa settimana</string>
+    <string name="week_starting">Settimana del %1$s</string><string name="day_amount">%1$s · %2$s</string>
+    <string name="latest">Ultime spese</string><string name="all_expenses">Vedi tutte</string>
+    <string name="no_expenses">Nessuna spesa in questo periodo.</string><string name="no_search_results">Nessuna spesa trovata.</string>
+    <string name="automatic">automatica</string><string name="pending">Da confermare</string>
+    <string name="expense_meta">%1$s · %2$s</string><string name="operation_failed">Operazione non riuscita</string>
+    <string name="section_management">Gestione</string><string name="section_data">Dati</string><string name="section_app">App</string>
+    <string name="version">Spese %1$s</string><string name="category_count">%1$d categorie</string>
+    <string name="recurring_count">%1$d attivi · ≈ %2$s al mese</string>
+    <string name="budget_summary">%1$s al mese · %2$d limiti</string>
+    <string name="budget_off_summary">%1$d limiti</string>
+    <string name="year_before">Anno precedente</string><string name="year_after">Anno successivo</string>
+    <string name="edit">Modifica</string><string name="tomorrow">Domani</string>
+</resources>

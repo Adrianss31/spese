@@ -12,3 +12,8 @@
 
 - La prima versione del database esporta lo schema Room. I test DAO eseguono SQLite tramite Robolectric.
 - Le date sono memorizzate come giorni dall'epoca e gli orari come nanosecondi dalla mezzanotte. Le spese conservano il riferimento storico a un ricorrente eliminato.
+
+## Fase 3
+
+- Home e Statistiche condividono il mese selezionato. La ricerca filtra le spese del mese per descrizione, categoria e importo.
+- Una spesa con Ripeti viene collegata al nuovo ricorrente nella stessa transazione. La data scelta nel foglio determina il giorno dell'addebito.
