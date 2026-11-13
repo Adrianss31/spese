@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Spese</string>
+    <string name="close">Chiudi</string>
+    <string name="undo">Annulla</string>
+    <string name="key_decimal">Virgola</string>
+    <string name="key_delete">Cancella</string>
+    <string name="currency_symbol">€</string>
+    <string name="expense_saved">Spesa salvata · %1$s</string>
+    <string name="new_expense">Nuova spesa</string>
+    <string name="save_expense">Salva spesa</string>
+    <string name="repeat">Ripeti</string>
+    <string name="week">Settimana</string>
+    <string name="month">Mese</string>
+    <string name="year">Anno</string>
+    <string name="category_groceries">Spesa</string>
+    <string name="category_home">Casa</string>
+</resources>

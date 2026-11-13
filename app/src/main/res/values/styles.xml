@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.Spese" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#0E0F12</item>
+        <item name="android:colorAccent">#C6F432</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>
