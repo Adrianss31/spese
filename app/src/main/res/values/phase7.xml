@@ -1,0 +1,4 @@
+<resources>
+    <string name="widget_saved">Spesa salvata</string>
+    <string name="widget_now">Oggi, %1$s</string>
+</resources>

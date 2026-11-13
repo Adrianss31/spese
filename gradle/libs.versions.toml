@@ -13,7 +13,10 @@ robolectric = "4.16.1"
 
 work = "2.11.2"
 
+glance = "1.2.0"
+
 [libraries]
+glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }

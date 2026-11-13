@@ -31,3 +31,8 @@
 
 - La generazione aggiorna il cursore del ricorrente nella stessa transazione delle spese. Al cambio di frequenza il cursore impedisce di riscrivere le occorrenze storiche.
 - Il lavoro giornaliero si ripianifica alle 00:05 locali. WorkManager può ritardarlo secondo le condizioni del dispositivo.
+
+## Fase 7
+
+- Il popup riusa l'editor delle spese. L'origine dell'animazione usa i limiti del widget se il launcher li fornisce.
+- Glance usa i font di sistema per il totale e un secondo aggiornamento per rimuovere la spunta.

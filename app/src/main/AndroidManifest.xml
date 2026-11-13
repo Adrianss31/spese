@@ -11,5 +11,17 @@
             </intent-filter>
         </activity>
         <receiver android:name=".data.ConfirmExpenseReceiver" android:exported="false" />
+        <activity
+            android:name=".ui.widget.WidgetPopupActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity="${applicationId}.popup"
+            android:theme="@style/Theme.Spese.Popup" />
+        <receiver android:name=".ui.widget.SpeseWidgetReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/spese_widget" />
+        </receiver>
     </application>
 </manifest>

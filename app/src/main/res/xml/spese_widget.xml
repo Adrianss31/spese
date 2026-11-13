@@ -1,0 +1,10 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:minWidth="48dp"
+    android:minHeight="48dp"
+    android:targetCellWidth="1"
+    android:targetCellHeight="1"
+    android:previewImage="@drawable/widget_add"
+    android:resizeMode="none"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />

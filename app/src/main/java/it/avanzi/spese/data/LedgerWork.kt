@@ -61,6 +61,7 @@ class LedgerWorker(context: Context, parameters: WorkerParameters) : CoroutineWo
                 LedgerNotifications(applicationContext).occurrence(event)
             }
             checkBudget(applicationContext)
+            it.avanzi.spese.ui.widget.SpeseWidget.refresh(applicationContext)
             if (inputData.getBoolean("daily", false)) scheduleNext(applicationContext, ExistingWorkPolicy.APPEND_OR_REPLACE)
             Result.success()
         } catch (cancelled: CancellationException) {
@@ -176,6 +177,7 @@ class ConfirmExpenseReceiver : BroadcastReceiver() {
                 if (expense != null) services.repository().confirmExpense(id, expense.amountCents)
                 context.getSystemService(NotificationManager::class.java).cancel(intent.getStringExtra("notification_tag"), 1)
                 checkBudget(context)
+                it.avanzi.spese.ui.widget.SpeseWidget.refresh(context, saved = true)
             } finally {
                 result.finish()
             }

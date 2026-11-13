@@ -194,7 +194,10 @@ fun SpeseScreen(model: SpeseViewModel) {
                 },
                 onUndo = { id ->
                     val saved = undo?.takeIf { it.expenseId == id }
-                    if (saved != null) scope.launch { model.repository.undo(saved) }
+                    if (saved != null) scope.launch {
+                        model.repository.undo(saved)
+                        it.avanzi.spese.ui.widget.SpeseWidget.refresh(context)
+                    }
                 },
                 modifier = Modifier.align(Alignment.TopCenter).padding(14.dp),
             )
@@ -235,6 +238,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                     )
                                 }
                                 editor = false
+                                it.avanzi.spese.ui.widget.SpeseWidget.refresh(context, saved = true)
                                 it.avanzi.spese.data.LedgerWorker.onOpen(context)
                             } catch (cancelled: CancellationException) {
                                 throw cancelled
