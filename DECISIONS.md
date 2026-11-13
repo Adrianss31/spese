@@ -36,3 +36,7 @@
 
 - Il popup riusa l'editor delle spese. L'origine dell'animazione usa i limiti del widget se il launcher li fornisce.
 - Glance usa i font di sistema per il totale e un secondo aggiornamento per rimuovere la spunta.
+
+## Fase 8
+
+- Gli intervalli includono entrambi gli estremi e l'export esclude gli importi da confermare. Nel CSV le celle di testo che possono essere interpretate come formule vengono protette con un apostrofo.

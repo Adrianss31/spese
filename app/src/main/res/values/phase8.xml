@@ -1,0 +1,15 @@
+<resources>
+    <string name="period">Periodo</string><string name="period_current">Questo mese</string>
+    <string name="period_previous">Mese scorso</string><string name="period_last_three">Ultimi 3 mesi</string>
+    <string name="period_year">Quest’anno</string><string name="period_all">Tutto</string>
+    <string name="period_custom">Personalizzato</string><string name="date_from">Dal</string><string name="date_through">Al</string>
+    <string name="format">Formato</string><string name="csv">CSV</string><string name="json">JSON</string>
+    <string name="markdown">Riassunto per IA</string>
+    <string name="csv_hint">Una riga per spesa, per fogli di calcolo e IA</string><string name="json_hint">Dati strutturati con categorie e ricorrenti</string>
+    <string name="markdown_hint">Totali, tabella e contesto in Markdown</string>
+    <string name="include">Includi</string><string name="include_descriptions">Descrizioni e note</string>
+    <string name="include_recurring">Segna le spese ricorrenti</string><string name="include_categories">Categorie e limiti</string>
+    <string name="preview">Anteprima</string><string name="preview_total">%1$s · %2$d spese · %3$s</string>
+    <string name="export_share">Esporta e condividi</string><string name="export_preparing">Preparazione…</string>
+    <string name="export_ready">%1$s pronto</string><string name="bad_date_range">La data Dal deve precedere o coincidere con la data Al.</string>
+</resources>

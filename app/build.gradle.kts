@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.work.runtime)
     implementation(libs.glance.appwidget)
+    implementation(libs.serialization.json)
     ksp(libs.room.compiler)
     implementation(libs.datastore)
     implementation(libs.hilt.android)

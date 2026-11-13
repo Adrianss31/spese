@@ -15,7 +15,10 @@ work = "2.11.2"
 
 glance = "1.2.0"
 
+serialization = "1.9.0"
+
 [libraries]
+serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
