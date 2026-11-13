@@ -45,3 +45,9 @@
 
 - Il repository GitHub è privato. Per gli aggiornamenti in app è previsto un token GitHub in sola lettura, protetto dall'Android Keystore.
 - Il download verifica dimensione, SHA-256, package, versione e certificato prima di consegnare l'APK all'installatore di Android.
+
+## CI
+
+- I workflow stanno in `.github/workflows`: `build.yml` a ogni push (APK debug come artifact, test) e `release.yml` sui tag `v*`.
+- Le note di rilascio vengono da `docs/CHANGELOG-<versione>.md` se esiste, altrimenti da quelle generate da GitHub. Finiscono in `version.json` e quindi nella schermata Aggiornamenti.
+- Keystore PKCS12 generato con OpenSSL, alias `spese`; resta fuori dal repository e arriva alla CI solo tramite secrets.

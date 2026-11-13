@@ -44,7 +44,12 @@ jobs:
           fi
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$SPESE_KEYSTORE"
           printf '%s\n' "$KEYSTORE_PASSWORD" > "$SPESE_PASSWORD_FILE"
-          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="$GITHUB_REF_NAME" --jq .body > "$RUNNER_TEMP/release-notes"
+          changelog="docs/CHANGELOG-${GITHUB_REF_NAME#v}.md"
+          if [[ -f "$changelog" ]]; then
+            cp "$changelog" "$RUNNER_TEMP/release-notes"
+          else
+            gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="$GITHUB_REF_NAME" --jq .body > "$RUNNER_TEMP/release-notes"
+          fi
           ci/publish-apk.sh "$RUNNER_TEMP/spese-assets" "$RUNNER_TEMP/release-notes"
           actual="$(jq -r .versionName "$RUNNER_TEMP/spese-assets/version.json")"
           [[ "$GITHUB_REF_NAME" == "v$actual" ]]
