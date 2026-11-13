@@ -17,3 +17,7 @@
 
 - Home e Statistiche condividono il mese selezionato. La ricerca filtra le spese del mese per descrizione, categoria e importo.
 - Una spesa con Ripeti viene collegata al nuovo ricorrente nella stessa transazione. La data scelta nel foglio determina il giorno dell'addebito.
+
+## Fase 4
+
+- Gli ultimi sei mesi terminano al mese selezionato e includono a zero i mesi senza spese.

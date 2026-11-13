@@ -148,6 +148,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 editor = true
                             }
                             Destination.MORE -> MoreContent(ledger) { destination = it }
+                            Destination.STATS -> it.avanzi.spese.ui.stats.Statistics(ledger)
                             else -> PageHeader(stringResource(screen.label), if (screen !in tabs) back else null)
                         }
                     }
