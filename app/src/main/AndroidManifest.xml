@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+        android:name=".SpeseApplication"
         android:label="@string/app_name"
         android:theme="@style/Theme.Spese" />
 </manifest>

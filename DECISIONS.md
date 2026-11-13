@@ -7,3 +7,8 @@
 - La build debug apre un'anteprima interattiva dei componenti con stato in memoria. La schermata di avvio dell'app arriverà con la Home.
 - Il foglio usa un dialog Compose a tutta finestra con scrim personalizzato e contenuto scrollabile per schermi bassi.
 - Il toast usa 3,4 secondi come durata base e rispetta il timeout esteso configurato per l'accessibilità.
+
+## Fase 2
+
+- La prima versione del database esporta lo schema Room. I test DAO eseguono SQLite tramite Robolectric.
+- Le date sono memorizzate come giorni dall'epoca e gli orari come nanosecondi dalla mezzanotte. Le spese conservano il riferimento storico a un ricorrente eliminato.
