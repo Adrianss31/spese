@@ -23,10 +23,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
       - name: Install Android SDK
-        run: sdkmanager 'platforms;android-37.2' 'build-tools;37.0.0'
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-37.2' 'build-tools;37.0.0' > /dev/null
       - name: Build and test
         run: ./gradlew assembleDebug testDebugUnitTest
       - name: Upload debug APK and reports
