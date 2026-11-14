@@ -7,16 +7,16 @@
     <string name="upcoming_month">In arrivo a %1$s</string><string name="charged_month">Già addebitati a %1$s</string>
     <string name="future_months">Prossimi mesi</string><string name="none_recurring">Nessun pagamento ricorrente.</string>
     <string name="in_days">tra %1$d giorni</string><string name="charged_on">addebitato il %1$d</string>
-    <string name="monthly_on">Ogni mese · il %1$d</string><string name="bimonthly_on">Ogni 2 mesi · il %1$d</string>
-    <string name="weekly_on">Ogni settimana · %1$s</string><string name="yearly_on">Ogni anno · %1$d %2$s</string>
+    
+    
     <string name="variable">Variabile</string><string name="reminder_label">Promemoria</string><string name="estimated_amount">~%1$s</string>
     <string name="variable_amount">Importo variabile</string><string name="variable_hint">Per bollette e consumi: l’importo è una stima da confermare</string>
     <string name="automatic_recording">Registra automaticamente</string>
     <string name="auto_hint">Comparirà tra le spese il giorno dell’addebito</string>
     <string name="variable_auto_hint">Ti chiederà di confermare l’importo il giorno dell’addebito</string>
     <string name="reminder_hint">Riceverai solo un promemoria</string>
-    <string name="estimate">Importo stimato</string><string name="day_of_month">Giorno del mese</string>
-    <string name="weekday">Giorno</string><string name="decrease">Diminuisci</string><string name="increase">Aumenta</string>
+    <string name="estimate">Importo stimato</string>
+    <string name="increase">Aumenta</string>
     <string name="frequency">Frequenza</string><string name="category">Categoria</string>
     <string name="recurring_preview">≈ %1$s al mese · Prossimo addebito: %2$s</string>
     <string name="first_charge">Primo addebito</string>

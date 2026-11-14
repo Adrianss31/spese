@@ -44,7 +44,11 @@ import androidx.compose.ui.unit.dp
 import it.avanzi.spese.R
 import it.avanzi.spese.data.CategoryEntity
 import it.avanzi.spese.data.ExpenseEntity
+import it.avanzi.spese.domain.ExpenseLine
 import it.avanzi.spese.domain.ExpenseStatus
+import it.avanzi.spese.domain.confirmedLines
+import it.avanzi.spese.domain.linesIn
+import it.avanzi.spese.domain.sumCents
 import it.avanzi.spese.domain.ItalianFormats
 import it.avanzi.spese.ui.components.AppBottomSheet
 import it.avanzi.spese.ui.components.CategoryTile
@@ -67,6 +71,7 @@ import java.util.Locale
 import kotlin.math.roundToLong
 
 fun LedgerState.monthExpenses() = expenses.filter { YearMonth.from(it.date) == month }
+fun LedgerState.monthLines(of: YearMonth = month) = expenses.linesIn(of, of, preferences.spreadRecurring)
 fun List<ExpenseEntity>.confirmed() = filter { it.status == ExpenseStatus.CONFIRMED }
 fun List<ExpenseEntity>.total() = sumOf(ExpenseEntity::amountCents)
 
@@ -82,9 +87,9 @@ fun HomeContent(
     onExpense: (ExpenseEntity) -> Unit,
 ) {
     val today = LocalDate.now()
-    val selected = state.monthExpenses()
-    val confirmed = selected.confirmed()
-    val total = confirmed.total()
+    val selected = state.monthLines()
+    val confirmed = selected.confirmedLines()
+    val total = confirmed.sumCents()
     val currentMonth = state.month == YearMonth.from(today)
     val monthName = state.month.month.getDisplayName(java.time.format.TextStyle.FULL, Locale.ITALY)
         .replaceFirstChar { it.titlecase(Locale.ITALY) }
@@ -135,7 +140,7 @@ fun HomeContent(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(SpeseIcons["tabRec"], null, Modifier.size(16.dp), tint = SpeseColors.TextMuted)
             Text(
-                stringResource(R.string.recurring_charged, ItalianFormats.money(confirmed.filter { it.recurringId != null }.total())),
+                stringResource(R.string.recurring_charged, ItalianFormats.money(confirmed.filter { it.expense.recurringId != null }.sumCents())),
                 style = SpeseText.Meta, color = SpeseColors.TextMuted,
             )
         }
@@ -202,8 +207,9 @@ private fun WeekCard(state: LedgerState, today: LocalDate) {
     val reference = if (active) today else state.month.atEndOfMonth()
     val monday = reference.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     val weekdays = (0L..6L).map(monday::plusDays)
-    val totals = state.expenses.confirmed().filter { it.date in weekdays }
-        .groupBy(ExpenseEntity::date).mapValues { it.value.total() }
+    val totals = state.expenses.linesIn(YearMonth.from(monday), YearMonth.from(monday.plusDays(6)), state.preferences.spreadRecurring)
+        .confirmedLines().filter { it.date in weekdays }
+        .groupBy(ExpenseLine::date).mapValues { it.value.sumCents() }
     val maximum = totals.values.maxOrNull()?.coerceAtLeast(1) ?: 1
     Card {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -258,7 +264,7 @@ private fun WeekCard(state: LedgerState, today: LocalDate) {
 
 @Composable
 fun ExpenseGroups(
-    expenses: List<ExpenseEntity>,
+    expenses: List<ExpenseLine>,
     categories: List<CategoryEntity>,
     highlightedId: Long? = null,
     onExpense: (ExpenseEntity) -> Unit,
@@ -266,18 +272,18 @@ fun ExpenseGroups(
     val today = LocalDate.now()
     val categoryById = categories.associateBy(CategoryEntity::id)
     if (expenses.isEmpty()) Text(stringResource(R.string.no_expenses), color = SpeseColors.TextMuted, style = SpeseText.Body)
-    expenses.groupBy(ExpenseEntity::date).forEach { (date, rows) ->
+    expenses.groupBy(ExpenseLine::date).forEach { (date, rows) ->
         val title = when (date) {
             today -> stringResource(R.string.today)
             today.minusDays(1) -> stringResource(R.string.yesterday)
             else -> ItalianFormats.dayHeading(date)
         }
-        SectionHeader(title, trailing = ItalianFormats.money(rows.confirmed().total()))
+        SectionHeader(title, trailing = ItalianFormats.money(rows.confirmedLines().sumCents()))
         Column(Modifier.fillMaxWidth().clip(SpeseShapes.Group).background(SpeseColors.Surface)) {
             rows.forEachIndexed { index, row ->
-                val category = categoryById[row.categoryId] ?: return@forEachIndexed
+                val category = categoryById[row.expense.categoryId] ?: return@forEachIndexed
                 if (index > 0) HorizontalDivider(color = SpeseColors.Divider)
-                ExpenseRow(row, category, row.id == highlightedId, onExpense)
+                ExpenseRow(row, category, row.expense.id == highlightedId, onExpense)
             }
         }
     }
@@ -285,9 +291,10 @@ fun ExpenseGroups(
 
 @Composable
 private fun ExpenseRow(
-    expense: ExpenseEntity, category: CategoryEntity, highlighted: Boolean,
+    line: ExpenseLine, category: CategoryEntity, highlighted: Boolean,
     onExpense: (ExpenseEntity) -> Unit,
 ) {
+    val expense = line.expense
     val reduced = LocalReducedMotion.current
     val intro = remember(expense.id) { Animatable(if (highlighted && !reduced) 0f else 1f) }
     LaunchedEffect(highlighted, reduced) {
@@ -304,8 +311,8 @@ private fun ExpenseRow(
             scaleX = .97f + .03f * intro.value
             scaleY = scaleX
         }.background(SpeseColors.Accent.copy(alpha = .2f * (1 - intro.value)))
-            .then(if (pending) Modifier.pressScale(interaction, .98f)
-                .clickable(interaction, indication = null) { onExpense(expense) } else Modifier)
+            .pressScale(interaction, .98f)
+            .clickable(interaction, indication = null) { onExpense(expense) }
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -320,9 +327,13 @@ private fun ExpenseRow(
                 val time = expense.time?.let(ItalianFormats::time) ?: stringResource(R.string.automatic)
                 Text(stringResource(R.string.expense_meta, category.name, time), color = SpeseColors.TextFaint, style = SpeseText.Meta)
             }
+            if (line.isQuota) Text(
+                stringResource(R.string.quota_meta, line.part, line.parts, ItalianFormats.money(expense.amountCents)),
+                color = SpeseColors.TextFaint, style = SpeseText.Meta,
+            )
             if (pending) Text(stringResource(R.string.pending), color = SpeseColors.Warning, style = SpeseText.MetaMedium)
         }
-        Text(ItalianFormats.money(-expense.amountCents), style = SpeseText.RowAmount)
+        Text(ItalianFormats.money(-line.cents), style = SpeseText.RowAmount)
     }
 }
 
@@ -331,7 +342,8 @@ fun ExpenseSearch(state: LedgerState, search: Boolean, onBack: () -> Unit, onExp
     var query by rememberSaveable { mutableStateOf("") }
     PageHeader(stringResource(if (search) R.string.search else R.string.latest), onBack)
     if (search) Field(query, { query = it }, stringResource(R.string.search), Modifier.fillMaxWidth())
-    val rows = state.monthExpenses().filter { expense ->
+    val rows = state.monthLines().filter { line ->
+        val expense = line.expense
         val category = state.categories.firstOrNull { it.id == expense.categoryId }
         query.isBlank() || expense.description.orEmpty().contains(query, ignoreCase = true) ||
             category?.name.orEmpty().contains(query, ignoreCase = true) || ItalianFormats.money(expense.amountCents).contains(query)

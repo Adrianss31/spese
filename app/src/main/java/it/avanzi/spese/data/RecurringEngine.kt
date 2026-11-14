@@ -3,6 +3,7 @@ package it.avanzi.spese.data
 import androidx.room.withTransaction
 import it.avanzi.spese.domain.ExpenseStatus
 import it.avanzi.spese.domain.occurrences
+import it.avanzi.spese.domain.spreadMonths
 import java.time.Instant
 import java.time.LocalDate
 import javax.inject.Inject
@@ -27,7 +28,7 @@ class RecurringEngine @Inject constructor(private val database: SpeseDatabase) {
                             amountCents = recurring.amountCents, categoryId = recurring.categoryId,
                             description = recurring.name, date = date, recurringId = recurring.id,
                             status = if (recurring.isVariable) ExpenseStatus.PENDING else ExpenseStatus.CONFIRMED,
-                            createdAt = now,
+                            createdAt = now, spreadMonths = recurring.spreadMonths(),
                         ))
                         if (recurring.isVariable && id != -1L) add(GeneratedOccurrence(recurring, date, id))
                     } else {

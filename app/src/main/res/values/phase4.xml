@@ -2,6 +2,4 @@
     <string name="total">Totale</string>
     <string name="recurring_share">%1$d%% ricorrenti</string>
     <string name="percentage">%1$d%%</string>
-    <string name="six_months">Ultimi 6 mesi</string>
-    <string name="average">Media %1$s</string>
 </resources>

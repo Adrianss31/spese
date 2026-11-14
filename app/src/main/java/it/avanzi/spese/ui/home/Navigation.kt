@@ -52,7 +52,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import it.avanzi.spese.R
 import it.avanzi.spese.data.SavedExpense
+import it.avanzi.spese.data.ExpenseEntity
+import it.avanzi.spese.domain.ExpenseStatus
 import it.avanzi.spese.domain.ItalianFormats
+import it.avanzi.spese.domain.monthlyCents
 import it.avanzi.spese.data.update.AvailableUpdate
 import it.avanzi.spese.ui.update.UpdateBanner
 import it.avanzi.spese.ui.update.UpdatesScreen
@@ -73,7 +76,6 @@ import java.time.YearMonth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.roundToLong
 
 enum class Destination(val label: Int, val icon: String) {
     HOME(R.string.home, "tabHome"),
@@ -103,6 +105,7 @@ fun SpeseScreen(model: SpeseViewModel) {
     var searchImmediately by rememberSaveable { mutableStateOf(false) }
     var toast by remember { mutableStateOf<ToastMessage?>(null) }
     var undo by remember { mutableStateOf<SavedExpense?>(null) }
+    var deleted by remember { mutableStateOf<ExpenseEntity?>(null) }
     var saving by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -209,12 +212,15 @@ fun SpeseScreen(model: SpeseViewModel) {
                     if (toast?.id == id) {
                         toast = null
                         undo = null
+                        deleted = null
                     }
                 },
                 onUndo = { id ->
                     val saved = undo?.takeIf { it.expenseId == id }
-                    if (saved != null) scope.launch {
-                        model.repository.undo(saved)
+                    val removed = deleted?.takeIf { it.id == id }
+                    if (saved != null || removed != null) scope.launch {
+                        if (saved != null) model.repository.undo(saved)
+                        if (removed != null) model.repository.restoreExpense(removed)
                         it.avanzi.spese.ui.widget.SpeseWidget.refresh(context)
                     }
                 },
@@ -229,7 +235,11 @@ fun SpeseScreen(model: SpeseViewModel) {
     }
 
     AppBottomSheet(
-        editor, stringResource(if (selectedExpense == 0L) R.string.new_expense else R.string.pending),
+        editor, stringResource(when {
+            selectedExpense == 0L -> R.string.new_expense
+            expense?.status == ExpenseStatus.PENDING -> R.string.pending
+            else -> R.string.edit_expense
+        }),
         onDismiss = { if (!saving) editor = false },
     ) {
         key(editorKey) {
@@ -241,8 +251,16 @@ fun SpeseScreen(model: SpeseViewModel) {
                         saving = true
                         scope.launch {
                             try {
-                                if (expense != null) {
+                                if (expense != null && expense.status == ExpenseStatus.PENDING) {
                                     model.repository.confirmExpense(expense.id, draft.cents)
+                                } else if (expense != null) {
+                                    model.repository.updateExpense(expense.copy(
+                                        amountCents = draft.cents, categoryId = draft.category.id,
+                                        description = draft.description.trim().ifEmpty { null }, date = draft.date,
+                                    ))
+                                    undo = null
+                                    deleted = null
+                                    toast = ToastMessage(expense.id, resources.getString(R.string.expense_updated), false)
                                 } else {
                                     val saved = model.save(
                                         draft.cents, draft.category, draft.description, draft.date, draft.frequency,
@@ -251,6 +269,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                     model.selectMonth(YearMonth.from(draft.date))
                                     destination = Destination.HOME
                                     undo = saved
+                                    deleted = null
                                     toast = ToastMessage(
                                         saved.expenseId,
                                         resources.getString(R.string.expense_saved, ItalianFormats.money(draft.cents)),
@@ -275,7 +294,27 @@ fun SpeseScreen(model: SpeseViewModel) {
                 initialCategory = expense?.categoryId ?: reminder?.categoryId,
                 initialDescription = (expense?.description ?: reminder?.name).orEmpty(),
                 initialDate = expense?.date ?: reminder?.let { LocalDate.ofEpochDay(reminderDay) } ?: LocalDate.now(),
-                confirmation = selectedExpense != 0L,
+                confirmation = expense?.status == ExpenseStatus.PENDING,
+                allowRepeat = expense == null,
+                onDelete = expense?.takeIf { it.status == ExpenseStatus.CONFIRMED }?.let { target ->
+                    {
+                        if (!saving) {
+                            saving = true
+                            scope.launch {
+                                try {
+                                    val removed = model.repository.deleteExpense(target.id)
+                                    undo = null
+                                    deleted = removed
+                                    if (removed != null) toast = ToastMessage(removed.id, resources.getString(R.string.expense_deleted))
+                                    editor = false
+                                    it.avanzi.spese.ui.widget.SpeseWidget.refresh(context)
+                                } finally {
+                                    saving = false
+                                }
+                            }
+                        }
+                    }
+                },
             )
         }
     }
@@ -369,7 +408,7 @@ private fun MoreContent(state: LedgerState, update: AvailableUpdate?, navigate: 
             Destination.CATEGORIES to stringResource(R.string.category_count, state.categories.size),
             Destination.RECURRING to stringResource(
                 R.string.recurring_count, active.size,
-                ItalianFormats.money(active.sumOf { it.amountCents * it.frequency.monthlyFactor }.roundToLong()),
+                ItalianFormats.money(active.sumOf { it.monthlyCents() }),
             ),
         ),
         R.string.section_data to listOf(Destination.EXPORT to null),

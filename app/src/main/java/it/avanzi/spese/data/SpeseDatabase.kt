@@ -1,5 +1,6 @@
 package it.avanzi.spese.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -12,7 +13,10 @@ import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.Update
 import androidx.room.Upsert
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import it.avanzi.spese.domain.ExpenseStatus
 import it.avanzi.spese.domain.Frequency
 import java.time.DayOfWeek
@@ -49,6 +53,8 @@ data class ExpenseEntity(
     val recurringId: Long? = null,
     val status: ExpenseStatus = ExpenseStatus.CONFIRMED,
     val createdAt: Instant,
+    /** Mesi su cui spalmare l'importo (addebiti non mensili dei ricorrenti); null = solo il mese della data. */
+    val spreadMonths: Int? = null,
 )
 
 @Entity(
@@ -65,6 +71,7 @@ data class RecurringEntity(
     val categoryId: Long,
     val iconKey: String,
     val frequency: Frequency,
+    @ColumnInfo(defaultValue = "1") val every: Int = 1,
     val dayOfMonth: Int? = null,
     val dayOfWeek: DayOfWeek? = null,
     val monthOfYear: Int? = null,
@@ -94,6 +101,9 @@ interface SpeseDao {
 
     @Query("SELECT * FROM expenses WHERE date BETWEEN :from AND :to AND status = 'CONFIRMED' ORDER BY date, id")
     suspend fun confirmedBetween(from: LocalDate, to: LocalDate): List<ExpenseEntity>
+
+    @Query("SELECT * FROM expenses WHERE date <= :to AND status = 'CONFIRMED' ORDER BY date, id")
+    suspend fun confirmedThrough(to: LocalDate): List<ExpenseEntity>
 
     @Query("SELECT COALESCE(SUM(amountCents), 0) FROM expenses WHERE date = :date AND status = 'CONFIRMED'")
     suspend fun totalOn(date: LocalDate): Long
@@ -127,6 +137,14 @@ interface SpeseDao {
     @Query("UPDATE expenses SET amountCents = :cents, status = 'CONFIRMED' WHERE id = :id AND status = 'PENDING'")
     suspend fun confirmExpense(id: Long, cents: Long): Int
 
+    @Update suspend fun updateExpense(expense: ExpenseEntity)
+
+    @Query("UPDATE expenses SET categoryId = :categoryId WHERE recurringId = :recurringId")
+    suspend fun recategorizeRecurring(recurringId: Long, categoryId: Long)
+
+    @Query("UPDATE expenses SET description = :name WHERE recurringId = :recurringId AND description = :previous")
+    suspend fun renameRecurring(recurringId: Long, previous: String, name: String)
+
     @Query("UPDATE recurrings SET lastGeneratedDate = :date WHERE id = :id")
     suspend fun markGenerated(id: Long, date: LocalDate)
 
@@ -151,9 +169,27 @@ interface SpeseDao {
 
 @Database(
     entities = [CategoryEntity::class, ExpenseEntity::class, RecurringEntity::class],
-    version = 1, exportSchema = true,
+    version = 2, exportSchema = true,
 )
 @TypeConverters(DateConverters::class)
 abstract class SpeseDatabase : RoomDatabase() {
     abstract fun dao(): SpeseDao
+
+    companion object {
+        /** Frequenza libera (unità + ogni N) e mesi di spalmamento salvati su ogni addebito. */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE recurrings ADD COLUMN every INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("UPDATE recurrings SET frequency = 'MONTHLY', every = 2 WHERE frequency = 'BIMONTHLY'")
+                db.execSQL("ALTER TABLE expenses ADD COLUMN spreadMonths INTEGER")
+                db.execSQL(
+                    """UPDATE expenses SET spreadMonths = (
+                        SELECT CASE WHEN r.frequency = 'YEARLY' THEN 12 * r.every
+                                    WHEN r.frequency = 'MONTHLY' AND r.every > 1 THEN r.every END
+                        FROM recurrings r WHERE r.id = expenses.recurringId
+                    ) WHERE recurringId IS NOT NULL""",
+                )
+            }
+        }
+    }
 }

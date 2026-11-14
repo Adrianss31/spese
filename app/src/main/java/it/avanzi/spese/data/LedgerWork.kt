@@ -22,6 +22,8 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import it.avanzi.spese.MainActivity
 import it.avanzi.spese.R
+import it.avanzi.spese.domain.linesIn
+import it.avanzi.spese.domain.sumCents
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
@@ -96,9 +98,10 @@ suspend fun checkBudget(context: Context) {
     if (!manager.allowed()) return
     val services = ledgerServices(context)
     val month = YearMonth.now()
-    val spent = services.database().dao().confirmedBetween(month.atDay(1), month.atEndOfMonth())
-    val totals = spent.groupBy { it.categoryId }.mapValues { (_, rows) -> rows.sumOf { it.amountCents } }
     val prefs = services.preferences().values.first()
+    val spent = services.database().dao().confirmedThrough(month.atEndOfMonth())
+        .linesIn(month, month, prefs.spreadRecurring)
+    val totals = spent.groupBy { it.expense.categoryId }.mapValues { (_, rows) -> rows.sumCents() }
     val limits = buildList {
         services.repository().categories.first().forEach { category ->
             category.monthlyLimitCents?.let { add(Triple(category.id, category.name, it)) }
@@ -108,7 +111,7 @@ suspend fun checkBudget(context: Context) {
         }
     }
     for ((id, label, limit) in limits) {
-        val total = if (id == 0L) spent.sumOf { it.amountCents } else totals[id] ?: 0L
+        val total = if (id == 0L) spent.sumCents() else totals[id] ?: 0L
         for (threshold in listOf(85, 100)) {
             val reached = BigDecimal.valueOf(total).movePointRight(2) >= BigDecimal.valueOf(limit) * BigDecimal.valueOf(threshold.toLong())
             if (reached && services.preferences().recordBudgetAlert(month.toString(), "$id:$threshold")) {

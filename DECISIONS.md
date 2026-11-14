@@ -51,3 +51,11 @@
 - I workflow stanno in `.github/workflows`: `build.yml` a ogni push (APK debug come artifact, test) e `release.yml` sui tag `v*`.
 - Le note di rilascio vengono da `docs/CHANGELOG-<versione>.md` se esiste, altrimenti da quelle generate da GitHub. Finiscono in `version.json` e quindi nella schermata Aggiornamenti.
 - Keystore PKCS12 generato con OpenSSL, alias `spese`; resta fuori dal repository e arriva alla CI solo tramite secrets.
+
+## 1.1.0
+
+- La frequenza è un'unità (giorno, settimana, mese, anno) più un intervallo `every`. La migrazione 1→2 trasforma i bimestrali in «ogni 2 mesi».
+- Ogni spesa generata da un ricorrente salva `spreadMonths` (mesi coperti, solo se più di uno). Lo spalmamento è una vista: l'addebito resta una riga sola nel database e le quote si calcolano in lettura, dal mese dell'addebito in avanti, con i centesimi di resto sui primi mesi. Le spese da confermare non si spalmano.
+- Cambiare la frequenza di un ricorrente non tocca gli addebiti passati, che conservano i loro mesi di spalmamento.
+- Nell'editor del ricorrente la data del prossimo addebito definisce giorno e fase della nuova regola e deve cadere dopo l'ultimo addebito generato: così non si creano addebiti doppi nello stesso periodo.
+- Export e widget usano gli addebiti reali, non le quote.

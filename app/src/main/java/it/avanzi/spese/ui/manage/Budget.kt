@@ -32,9 +32,10 @@ import it.avanzi.spese.ui.home.IconAction
 import it.avanzi.spese.ui.home.LedgerState
 import it.avanzi.spese.ui.home.PageHeader
 import it.avanzi.spese.ui.home.SpeseViewModel
-import it.avanzi.spese.ui.home.confirmed
+import it.avanzi.spese.domain.confirmedLines
+import it.avanzi.spese.domain.sumCents
+import it.avanzi.spese.ui.home.monthLines
 import it.avanzi.spese.ui.home.parseCents
-import it.avanzi.spese.ui.home.total
 import it.avanzi.spese.ui.theme.SpeseColors
 import it.avanzi.spese.ui.theme.SpeseText
 import java.time.LocalDate
@@ -51,8 +52,8 @@ fun Budget(state: LedgerState, model: SpeseViewModel, back: () -> Unit) {
     var input by rememberSaveable { mutableStateOf("") }
     val today = LocalDate.now()
     val month = YearMonth.from(today)
-    val recent = state.expenses.confirmed().filter { YearMonth.from(it.date) == month }
-    val sums = recent.groupBy { it.categoryId }.mapValues { it.value.total() }
+    val recent = state.monthLines(month).confirmedLines()
+    val sums = recent.groupBy { it.expense.categoryId }.mapValues { it.value.sumCents() }
     val days = month.lengthOfMonth() - today.dayOfMonth + 1
 
     PageHeader(stringResource(R.string.budget), back)
@@ -65,7 +66,7 @@ fun Budget(state: LedgerState, model: SpeseViewModel, back: () -> Unit) {
             }
         })
         if (preferences.overallBudgetEnabled) {
-            val remaining = preferences.overallBudgetCents - recent.total()
+            val remaining = preferences.overallBudgetCents - recent.sumCents()
             Text(ItalianFormats.money(remaining), style = SpeseText.Total, color = if (remaining < 0) SpeseColors.Danger else SpeseColors.Text)
             Text(
                 stringResource(R.string.budget_remaining, ItalianFormats.money(preferences.overallBudgetCents), days, ItalianFormats.money(remaining.coerceAtLeast(0) / days)),

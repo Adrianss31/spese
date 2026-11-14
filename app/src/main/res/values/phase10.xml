@@ -1,0 +1,22 @@
+<resources>
+    <string name="day">Giorno</string><string name="days">Giorni</string><string name="weeks">Settimane</string>
+    <string name="months">Mesi</string><string name="years">Anni</string><string name="every">Ogni</string>
+    <string name="quota_meta">Quota %1$d/%2$d di %3$s</string>
+    <string name="edit_expense">Modifica spesa</string>
+    <string name="expense_updated">Spesa aggiornata</string>
+    <string name="expense_deleted">Spesa eliminata</string>
+    <string name="spread_recurring">Spalma sui mesi</string>
+    <string name="spread_hint">Gli addebiti che coprono più mesi, come annuali e trimestrali, contano una quota al mese in Home, Budget e Statistiche</string>
+    <string name="view_per_charge">Per addebito</string><string name="view_per_month">Al mese</string>
+    <string name="monthly_cost_each">Costo mensile di ciascuno</string>
+    <string name="per_month">≈ %1$s/mese</string>
+    <string name="per_charge">%1$s ad addebito</string>
+    <string name="next_charge">Prossimo addebito</string>
+    <string name="after_last_charge">Scegli una data dopo l’ultimo addebito (%1$s)</string>
+    <string name="apply_to_past">Aggiorna anche le spese già registrate</string>
+    <string name="apply_to_past_hint">%1$d spese prendono il nuovo nome e la nuova categoria. Gli importi passati non cambiano.</string>
+    <string name="stats_month">Mese</string><string name="stats_year">Anno</string>
+    <string name="monthly_trend">Andamento mensile</string>
+    <string name="monthly_average">Media mensile %1$s</string>
+    <string name="since">Da %1$s</string>
+</resources>

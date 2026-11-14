@@ -11,6 +11,7 @@ import it.avanzi.spese.data.SavedExpense
 import it.avanzi.spese.data.SpesePreferences
 import it.avanzi.spese.data.SpeseRepository
 import it.avanzi.spese.domain.Frequency
+import it.avanzi.spese.domain.spreadMonths
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -81,6 +82,6 @@ class SpeseViewModel @Inject constructor(
                 anchorDate = date, lastGeneratedDate = date,
             )
         }
-        return repository.saveExpense(expense, recurring)
+        return repository.saveExpense(expense.copy(spreadMonths = recurring?.spreadMonths()), recurring)
     }
 }

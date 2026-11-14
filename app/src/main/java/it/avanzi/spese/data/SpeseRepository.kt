@@ -1,6 +1,7 @@
 package it.avanzi.spese.data
 
 import androidx.room.withTransaction
+import it.avanzi.spese.domain.spreadMonths
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,9 +45,11 @@ class SpeseRepository @Inject constructor(private val database: SpeseDatabase) {
         database.withTransaction {
             val category = dao.category(expense.categoryId) ?: checkNotNull(dao.fallbackCategory())
             val recurringId = recurring?.let { dao.upsertRecurring(it.copy(categoryId = category.id)) }
+            val source = recurring ?: expense.recurringId?.let { dao.recurring(it) }
             val expenseId = dao.insertExpense(expense.copy(
                 categoryId = category.id,
                 recurringId = recurringId ?: expense.recurringId,
+                spreadMonths = expense.spreadMonths ?: source?.spreadMonths(),
             ))
             check(expenseId != -1L)
             SavedExpense(expenseId, recurringId)
@@ -57,16 +60,37 @@ class SpeseRepository @Inject constructor(private val database: SpeseDatabase) {
         saved.newRecurringId?.let { dao.deleteRecurring(it) }
     }
 
-    suspend fun saveRecurring(recurring: RecurringEntity) = database.withTransaction {
+    /**
+     * Le modifiche valgono dagli addebiti successivi. Con [applyToPast] nome e categoria nuovi
+     * vengono riportati anche sulle spese già registrate (l'importo mai).
+     */
+    suspend fun saveRecurring(recurring: RecurringEntity, applyToPast: Boolean = false) = database.withTransaction {
         val category = dao.category(recurring.categoryId) ?: checkNotNull(dao.fallbackCategory())
         val existing = dao.recurring(recurring.id)
         dao.upsertRecurring(recurring.copy(
             categoryId = category.id,
             lastGeneratedDate = existing?.lastGeneratedDate ?: recurring.lastGeneratedDate,
         ))
+        if (applyToPast && existing != null) {
+            if (existing.categoryId != category.id) dao.recategorizeRecurring(existing.id, category.id)
+            if (existing.name != recurring.name) dao.renameRecurring(existing.id, existing.name, recurring.name)
+        }
     }
 
     suspend fun deleteRecurring(id: Long) = dao.deleteRecurring(id)
+
+    suspend fun updateExpense(expense: ExpenseEntity) = database.withTransaction {
+        val category = dao.category(expense.categoryId) ?: checkNotNull(dao.fallbackCategory())
+        dao.updateExpense(expense.copy(categoryId = category.id))
+    }
+
+    suspend fun deleteExpense(id: Long): ExpenseEntity? = database.withTransaction {
+        dao.expense(id)?.also { dao.deleteExpense(id) }
+    }
+
+    suspend fun restoreExpense(expense: ExpenseEntity) {
+        dao.insertExpense(expense)
+    }
     suspend fun confirmExpense(id: Long, cents: Long): Boolean {
         require(cents > 0)
         return dao.confirmExpense(id, cents) > 0

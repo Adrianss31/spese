@@ -11,7 +11,7 @@
     <string name="repeat_week">Verrà registrata da sola ogni %1$s.</string>
     <string name="repeat_month">Verrà registrata da sola il %1$d di ogni mese.</string>
     <string name="repeat_year">Verrà registrata da sola ogni %1$d %2$s.</string>
-    <string name="save">Salva</string><string name="confirm">Conferma</string><string name="bimonth">2 mesi</string>
+    <string name="save">Salva</string><string name="confirm">Conferma</string>
     <string name="back">Indietro</string><string name="change_month">Cambia mese, ora %1$s</string>
     <string name="search">Cerca tra le spese</string><string name="spent_month">Speso questo mese</string>
     <string name="spent_period">Speso nel mese</string>

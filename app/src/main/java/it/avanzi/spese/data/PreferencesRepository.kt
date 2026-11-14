@@ -25,6 +25,7 @@ data class SpesePreferences(
     val channel: UpdateChannel = UpdateChannel.STABLE,
     val lastCheck: Instant? = null,
     val bannerDismissedVersion: String? = null,
+    val spreadRecurring: Boolean = true,
 )
 
 @Singleton
@@ -39,6 +40,7 @@ class PreferencesRepository @Inject constructor(@ApplicationContext context: Con
             data[channel]?.let(UpdateChannel::valueOf) ?: UpdateChannel.STABLE,
             data[lastCheck]?.let(Instant::ofEpochMilli),
             data[bannerDismissed],
+            data[spreadRecurring] ?: true,
         )
     }
 
@@ -50,6 +52,7 @@ class PreferencesRepository @Inject constructor(@ApplicationContext context: Con
     suspend fun setChannel(value: UpdateChannel) = put(channel, value.name)
     suspend fun setLastCheck(value: Instant) = put(lastCheck, value.toEpochMilli())
     suspend fun dismissBanner(version: String) = put(bannerDismissed, version)
+    suspend fun setSpreadRecurring(value: Boolean) = put(spreadRecurring, value)
 
     suspend fun recordBudgetAlert(month: String, alert: String): Boolean {
         var added = false
@@ -78,5 +81,6 @@ class PreferencesRepository @Inject constructor(@ApplicationContext context: Con
         val channel = stringPreferencesKey("update.channel")
         val lastCheck = longPreferencesKey("update.lastCheck")
         val bannerDismissed = stringPreferencesKey("update.bannerDismissedVersion")
+        val spreadRecurring = booleanPreferencesKey("spreadRecurring")
     }
 }

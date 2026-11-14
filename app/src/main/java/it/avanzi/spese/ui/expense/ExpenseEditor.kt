@@ -66,6 +66,8 @@ fun ExpenseEditor(
     initialDescription: String = "",
     initialDate: LocalDate = LocalDate.now(),
     confirmation: Boolean = false,
+    allowRepeat: Boolean = true,
+    onDelete: (() -> Unit)? = null,
 ) {
     var amount by rememberSaveable {
         mutableStateOf(initialCents?.let { BigDecimal.valueOf(it, 2).toPlainString().replace('.', ',') }
@@ -96,7 +98,7 @@ fun ExpenseEditor(
                 DateAction(date, stringResource(R.string.date)) { day = it.toEpochDay() }
             }
         }
-        if (!compact) {
+        if (!compact && allowRepeat) {
             Column(
                 Modifier.fillMaxWidth().background(SpeseColors.Bg, SpeseShapes.Key)
                     .padding(horizontal = 14.dp),
@@ -139,15 +141,17 @@ fun ExpenseEditor(
     )
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         if (onCancel != null) Action(stringResource(R.string.undo), onCancel, Modifier.weight(1f))
+        if (onDelete != null) Action(stringResource(R.string.delete), onDelete, danger = true, enabled = !saving)
         Action(
             stringResource(when {
                 confirmation -> R.string.confirm
+                onDelete != null -> R.string.save
                 compact -> R.string.save
                 else -> R.string.save_expense
             }),
             onClick = {
                 if (input.cents <= 0 || category == null) shake++
-                else onSave(ExpenseDraft(input.cents, category, description, date, frequency.takeIf { repeat }))
+                else onSave(ExpenseDraft(input.cents, category, description, date, frequency.takeIf { repeat && allowRepeat }))
             },
             Modifier.weight(1f), primary = true, enabled = !saving,
             dimmed = input.cents == 0L || category == null, icon = "check",
@@ -187,9 +191,9 @@ fun DateAction(date: LocalDate, label: String, onChange: (LocalDate) -> Unit) {
     }
 }
 
-fun Frequency.label() = when (this) {
-    Frequency.WEEKLY -> R.string.week
-    Frequency.MONTHLY -> R.string.month
-    Frequency.BIMONTHLY -> R.string.bimonth
-    Frequency.YEARLY -> R.string.year
+fun Frequency.label(plural: Boolean = false) = when (this) {
+    Frequency.DAILY -> if (plural) R.string.days else R.string.day
+    Frequency.WEEKLY -> if (plural) R.string.weeks else R.string.week
+    Frequency.MONTHLY -> if (plural) R.string.months else R.string.month
+    Frequency.YEARLY -> if (plural) R.string.years else R.string.year
 }

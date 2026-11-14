@@ -125,7 +125,7 @@ object ExportWriter {
                         put("nome", recurring.name)
                         put("categoria", data.category(recurring.categoryId))
                         put("importo", JsonPrimitive(decimal(recurring.amountCents)))
-                        put("frequenza", frequency(recurring.frequency))
+                        put("frequenza", periodName(recurring.frequency, recurring.every).lowercase())
                         put("variabile", recurring.isVariable)
                         put("automatico", recurring.autoRecord)
                     })
@@ -174,7 +174,7 @@ object ExportWriter {
             appendLine()
             appendLine("## Ricorrenti attivi")
             data.recurrings.filter { it.active }.forEach {
-                appendLine("- ${cell(it.name)} · ${frequency(it.frequency)} · circa ${ItalianFormats.money((it.amountCents * it.frequency.monthlyFactor).roundToLong())} al mese")
+                appendLine("- ${cell(it.name)} · ${periodName(it.frequency, it.every).lowercase()} · circa ${ItalianFormats.money(it.monthlyCents())} al mese")
             }
         }
         appendLine()
@@ -197,10 +197,4 @@ object ExportWriter {
     private fun decimal(cents: Long) = BigDecimal.valueOf(cents, 2)
     private fun cell(value: String) = value.replace("\\", "\\\\").replace("|", "\\|")
         .replace("<", "&lt;").replace(">", "&gt;").replace(Regex("[\\r\\n]+"), " ")
-    private fun frequency(value: Frequency) = when (value) {
-        Frequency.WEEKLY -> "settimanale"
-        Frequency.MONTHLY -> "mensile"
-        Frequency.BIMONTHLY -> "bimestrale"
-        Frequency.YEARLY -> "annuale"
-    }
 }
