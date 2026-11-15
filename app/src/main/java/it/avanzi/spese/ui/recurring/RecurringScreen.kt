@@ -36,6 +36,7 @@ import it.avanzi.spese.domain.nextOnOrAfter
 import it.avanzi.spese.domain.occurrences
 import it.avanzi.spese.domain.periodName
 import it.avanzi.spese.domain.scheduleLabel
+import it.avanzi.spese.domain.spreadMonths
 import it.avanzi.spese.ui.components.AppBottomSheet
 import it.avanzi.spese.ui.components.CategoryTile
 import it.avanzi.spese.ui.components.SectionHeader
