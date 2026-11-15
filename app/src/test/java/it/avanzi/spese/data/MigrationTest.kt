@@ -32,12 +32,13 @@ class MigrationTest {
             db.version = 1
         }
         val database = Room.databaseBuilder(context, SpeseDatabase::class.java, file.absolutePath)
-            .addMigrations(SpeseDatabase.MIGRATION_1_2).allowMainThreadQueries().build()
+            .addMigrations(SpeseDatabase.MIGRATION_1_2, SpeseDatabase.MIGRATION_2_3).allowMainThreadQueries().build()
         try {
             val recurrings = database.dao().recurrings().first().associateBy { it.id }
             assertEquals(Frequency.MONTHLY to 2, recurrings.getValue(1).let { it.frequency to it.every })
             assertEquals(Frequency.YEARLY to 1, recurrings.getValue(2).let { it.frequency to it.every })
             assertEquals(1, recurrings.getValue(3).every)
+            assertEquals(listOf(true, true, true), listOf(1L, 2L, 3L).map { recurrings.getValue(it).spread })
             val spread = database.dao().expenses().first().associate { it.id to it.spreadMonths }
             assertEquals(mapOf(1L to 2, 2L to 12, 3L to null, 4L to null), spread)
         } finally {

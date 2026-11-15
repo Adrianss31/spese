@@ -67,6 +67,7 @@ class SpeseViewModel @Inject constructor(
         date: LocalDate,
         frequency: Frequency?,
         existingRecurringId: Long? = null,
+        spread: Boolean = true,
     ): SavedExpense {
         val name = description.trim().ifBlank { category.name }
         val expense = ExpenseEntity(
@@ -79,7 +80,7 @@ class SpeseViewModel @Inject constructor(
                 frequency = it, dayOfMonth = date.dayOfMonth.takeUnless { _ -> it == Frequency.WEEKLY },
                 dayOfWeek = date.dayOfWeek.takeIf { _ -> it == Frequency.WEEKLY },
                 monthOfYear = date.monthValue.takeIf { _ -> it == Frequency.YEARLY },
-                anchorDate = date, lastGeneratedDate = date,
+                anchorDate = date, lastGeneratedDate = date, spread = spread,
             )
         }
         return repository.saveExpense(expense.copy(spreadMonths = recurring?.spreadMonths()), recurring)

@@ -60,7 +60,7 @@ fun spreadMonths(frequency: Frequency, every: Int): Int? = when (frequency) {
     else -> 1
 }.takeIf { it > 1 }
 
-fun RecurringEntity.spreadMonths(): Int? = spreadMonths(frequency, every)
+fun RecurringEntity.spreadMonths(): Int? = if (spread) spreadMonths(frequency, every) else null
 
 fun periodName(frequency: Frequency, every: Int): String = when (frequency) {
     Frequency.DAILY -> if (every == 1) "Ogni giorno" else "Ogni $every giorni"

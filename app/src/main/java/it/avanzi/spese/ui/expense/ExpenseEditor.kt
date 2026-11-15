@@ -52,6 +52,7 @@ data class ExpenseDraft(
     val description: String,
     val date: LocalDate,
     val frequency: Frequency?,
+    val spread: Boolean = true,
 )
 
 @Composable
@@ -78,6 +79,7 @@ fun ExpenseEditor(
     var day by rememberSaveable { mutableLongStateOf(initialDate.toEpochDay()) }
     var repeat by rememberSaveable { mutableStateOf(false) }
     var frequency by rememberSaveable { mutableStateOf(Frequency.MONTHLY) }
+    var spread by rememberSaveable { mutableStateOf(true) }
     var bump by remember { mutableIntStateOf(0) }
     var shake by remember { mutableIntStateOf(0) }
     val date = LocalDate.ofEpochDay(day)
@@ -123,6 +125,13 @@ fun ExpenseEditor(
                             else -> stringResource(R.string.repeat_month, date.dayOfMonth)
                         }
                         Text(hint, color = SpeseColors.TextMuted, style = SpeseText.Meta)
+                        if (frequency == Frequency.YEARLY) {
+                            SwitchRow(
+                                stringResource(R.string.spread_recurring), spread, { spread = it },
+                                subtitle = if (spread) stringResource(R.string.spread_recurring_on_hint, 12)
+                                else stringResource(R.string.spread_recurring_off_hint),
+                            )
+                        }
                     }
                 }
             }
@@ -151,7 +160,7 @@ fun ExpenseEditor(
             }),
             onClick = {
                 if (input.cents <= 0 || category == null) shake++
-                else onSave(ExpenseDraft(input.cents, category, description, date, frequency.takeIf { repeat && allowRepeat }))
+                else onSave(ExpenseDraft(input.cents, category, description, date, frequency.takeIf { repeat && allowRepeat }, spread))
             },
             Modifier.weight(1f), primary = true, enabled = !saving,
             dimmed = input.cents == 0L || category == null, icon = "check",

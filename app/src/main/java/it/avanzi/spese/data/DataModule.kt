@@ -16,5 +16,5 @@ object DataModule {
     @Singleton
     fun database(@ApplicationContext context: Context): SpeseDatabase =
         Room.databaseBuilder(context, SpeseDatabase::class.java, "spese.db")
-            .addMigrations(SpeseDatabase.MIGRATION_1_2).build()
+            .addMigrations(SpeseDatabase.MIGRATION_1_2, SpeseDatabase.MIGRATION_2_3).build()
 }

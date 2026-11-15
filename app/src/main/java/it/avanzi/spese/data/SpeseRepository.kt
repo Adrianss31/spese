@@ -71,6 +71,9 @@ class SpeseRepository @Inject constructor(private val database: SpeseDatabase) {
             categoryId = category.id,
             lastGeneratedDate = existing?.lastGeneratedDate ?: recurring.lastGeneratedDate,
         ))
+        if (existing != null && existing.spread != recurring.spread) {
+            dao.updateRecurringSpread(existing.id, recurring.spreadMonths())
+        }
         if (applyToPast && existing != null) {
             if (existing.categoryId != category.id) dao.recategorizeRecurring(existing.id, category.id)
             if (existing.name != recurring.name) dao.renameRecurring(existing.id, existing.name, recurring.name)

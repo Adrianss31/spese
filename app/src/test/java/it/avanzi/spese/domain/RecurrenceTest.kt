@@ -74,4 +74,11 @@ class RecurrenceTest {
             moved.occurrences(LocalDate.parse("2026-11-06"), LocalDate.parse("2026-11-30")).toList())
         assertEquals(LocalDate.parse("2026-12-20"), moved.nextOnOrAfter(LocalDate.parse("2026-11-06")))
     }
+
+    @Test fun unspreadRecurringReturnsNullSpreadMonths() {
+        val quarterly = monthly.copy(every = 3, spread = false)
+        val biennial = monthly.copy(frequency = Frequency.YEARLY, every = 2, spread = false)
+        assertEquals(null, quarterly.spreadMonths())
+        assertEquals(null, biennial.spreadMonths())
+    }
 }

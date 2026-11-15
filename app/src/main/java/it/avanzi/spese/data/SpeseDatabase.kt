@@ -80,6 +80,7 @@ data class RecurringEntity(
     val autoRecord: Boolean = true,
     val active: Boolean = true,
     val lastGeneratedDate: LocalDate? = null,
+    @ColumnInfo(defaultValue = "1") val spread: Boolean = true,
 )
 
 class DateConverters {
@@ -145,6 +146,9 @@ interface SpeseDao {
     @Query("UPDATE expenses SET description = :name WHERE recurringId = :recurringId AND description = :previous")
     suspend fun renameRecurring(recurringId: Long, previous: String, name: String)
 
+    @Query("UPDATE expenses SET spreadMonths = :spreadMonths WHERE recurringId = :recurringId")
+    suspend fun updateRecurringSpread(recurringId: Long, spreadMonths: Int?)
+
     @Query("UPDATE recurrings SET lastGeneratedDate = :date WHERE id = :id")
     suspend fun markGenerated(id: Long, date: LocalDate)
 
@@ -169,7 +173,7 @@ interface SpeseDao {
 
 @Database(
     entities = [CategoryEntity::class, ExpenseEntity::class, RecurringEntity::class],
-    version = 2, exportSchema = true,
+    version = 3, exportSchema = true,
 )
 @TypeConverters(DateConverters::class)
 abstract class SpeseDatabase : RoomDatabase() {
@@ -189,6 +193,13 @@ abstract class SpeseDatabase : RoomDatabase() {
                         FROM recurrings r WHERE r.id = expenses.recurringId
                     ) WHERE recurringId IS NOT NULL""",
                 )
+            }
+        }
+
+        /** Scelta per singolo ricorrente: spalmare sui mesi o tenere l'intero addebito nel suo mese. */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE recurrings ADD COLUMN spread INTEGER NOT NULL DEFAULT 1")
             }
         }
     }

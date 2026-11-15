@@ -224,6 +224,7 @@ private fun RecurringEditor(
     var every by rememberSaveable { mutableIntStateOf(existing?.every ?: 1) }
     var variable by rememberSaveable { mutableStateOf(existing?.isVariable ?: false) }
     var auto by rememberSaveable { mutableStateOf(existing?.autoRecord ?: true) }
+    var spread by rememberSaveable { mutableStateOf(existing?.spread ?: true) }
     var day by rememberSaveable { mutableLongStateOf(suggested.toEpochDay()) }
     var applyToPast by rememberSaveable { mutableStateOf(false) }
 
@@ -252,7 +253,7 @@ private fun RecurringEditor(
         it.copy(
             name = name.trim(), amountCents = amount ?: 0, categoryId = category!!.id,
             iconKey = existing?.iconKey?.takeIf { existing.categoryId == category.id } ?: category.iconKey,
-            isVariable = variable, autoRecord = auto,
+            isVariable = variable, autoRecord = auto, spread = spread,
         )
     }
     Field(name, { name = it }, stringResource(R.string.name), Modifier.fillMaxWidth())
@@ -279,6 +280,13 @@ private fun RecurringEditor(
         subtitle = stringResource(R.string.apply_to_past_hint, pastCount),
     )
     SwitchRow(stringResource(R.string.variable_amount), variable, { variable = it }, subtitle = stringResource(R.string.variable_hint))
+    spreadMonths(unit, every)?.let { months ->
+        SwitchRow(
+            stringResource(R.string.spread_recurring), spread, { spread = it },
+            subtitle = if (spread) stringResource(R.string.spread_recurring_on_hint, months)
+            else stringResource(R.string.spread_recurring_off_hint),
+        )
+    }
     SwitchRow(
         stringResource(R.string.automatic_recording), auto, { auto = it },
         subtitle = stringResource(when {

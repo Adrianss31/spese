@@ -86,4 +86,26 @@ class SpeseDaoTest {
         assertEquals(1800L, database.dao().totalOn(today))
         assertEquals(emptyList<GeneratedOccurrence>(), engine.generate(today, Instant.EPOCH))
     }
+
+    @Test fun togglingSpreadUpdatesPastAndFutureCharges() = runBlocking {
+        repository.initializeCategories()
+        val category = repository.categories.first().first()
+        val anchor = LocalDate.parse("2026-01-10")
+        val rule = RecurringEntity(
+            name = "Assicurazione", amountCents = 60000, categoryId = category.id, iconKey = "shield",
+            frequency = it.avanzi.spese.domain.Frequency.YEARLY, dayOfMonth = 10, monthOfYear = 1,
+            anchorDate = anchor, spread = true,
+        )
+        repository.saveRecurring(rule)
+        val savedRule = repository.recurrings.first().single()
+        val engine = RecurringEngine(database)
+        engine.generate(LocalDate.parse("2026-01-15"), Instant.EPOCH)
+        assertEquals(listOf(12), repository.expenses.first().map { it.spreadMonths })
+
+        repository.saveRecurring(savedRule.copy(spread = false))
+        assertEquals(listOf<Int?>(null), repository.expenses.first().map { it.spreadMonths })
+
+        engine.generate(LocalDate.parse("2027-01-15"), Instant.EPOCH)
+        assertEquals(listOf<Int?>(null, null), repository.expenses.first().map { it.spreadMonths })
+    }
 }

@@ -264,7 +264,7 @@ fun SpeseScreen(model: SpeseViewModel) {
                                 } else {
                                     val saved = model.save(
                                         draft.cents, draft.category, draft.description, draft.date, draft.frequency,
-                                        reminderId.takeIf { it > 0 },
+                                        reminderId.takeIf { it > 0 }, draft.spread,
                                     )
                                     model.selectMonth(YearMonth.from(draft.date))
                                     destination = Destination.HOME

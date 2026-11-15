@@ -7,6 +7,8 @@
     <string name="expense_deleted">Spesa eliminata</string>
     <string name="spread_recurring">Spalma sui mesi</string>
     <string name="spread_hint">Gli addebiti che coprono più mesi, come annuali e trimestrali, contano una quota al mese in Home, Budget e Statistiche</string>
+    <string name="spread_recurring_on_hint">Quota mensile su %1$d mesi in Home, Budget e Statistiche</string>
+    <string name="spread_recurring_off_hint">Conta per intero solo nel mese in cui appare</string>
     <string name="view_per_charge">Per addebito</string><string name="view_per_month">Al mese</string>
     <string name="monthly_cost_each">Costo mensile di ciascuno</string>
     <string name="per_month">≈ %1$s/mese</string>
