@@ -1,0 +1,1 @@
+- **Backup e ripristino via AppHub**: aggiunto il provider locale protetto da firma per esportare e ripristinare database e preferenze di Spese tramite AppHub.
